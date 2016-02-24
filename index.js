@@ -11013,7 +11013,11 @@ Elm.Github.make = function (_elm) {
    var starsStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "fontSize",_1: "56px"}
                                                    ,{ctor: "_Tuple2",_0: "fontWeight",_1: "600"}
                                                    ,{ctor: "_Tuple2",_0: "color",_1: "#343434"}]));
+   var star = function (model) {
+      return _U.cmp(model.stars,0) > 0 ? A2($Html.div,_U.list([starsStyle]),_U.list([$Html.text($Basics.toString(model.stars))])) : $Html.text("");
+   };
    var h1Style = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "fontSize",_1: "56px"},{ctor: "_Tuple2",_0: "color",_1: "#343434"}]));
+   var header = A2($Html.h1,_U.list([h1Style]),_U.list([$Html.text("enter your github username and press enter")]));
    var containerStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "display",_1: "flex"}
                                                        ,{ctor: "_Tuple2",_0: "alignItems",_1: "center"}
                                                        ,{ctor: "_Tuple2",_0: "justifyContent",_1: "center"}
@@ -11038,23 +11042,20 @@ Elm.Github.make = function (_elm) {
    var submitEffects = function (user) {    return $Effects.task(A2($Task.map,OnSubmit,$Task.toResult(httpTask(user))));};
    var Submit = {ctor: "Submit"};
    var KeyPress = function (a) {    return {ctor: "KeyPress",_0: a};};
-   var view = F2(function (address,model) {
-      return A2($Html.div,
-      _U.list([containerStyle]),
-      _U.list([A2($Html.h1,_U.list([h1Style]),_U.list([$Html.text("enter your github username and press enter")]))
-              ,A2($Html.input,
-              _U.list([$Html$Attributes.placeholder("conorhastings")
-                      ,$Html$Attributes.value(model.input)
-                      ,A3($Html$Events.on,"input",$Html$Events.targetValue,function (_p1) {    return A2($Signal.message,address,KeyPress(_p1));})
-                      ,A2(onEnter,address,Submit)
-                      ,inputStyle]),
-              _U.list([]))
-              ,A2($Html.div,_U.list([starsStyle]),_U.list([$Html.text($Basics.toString(model.stars))]))]));
+   var nameInput = F2(function (address,model) {
+      return A2($Html.input,
+      _U.list([$Html$Attributes.placeholder("conorhastings")
+              ,$Html$Attributes.value(model.input)
+              ,A3($Html$Events.on,"input",$Html$Events.targetValue,function (_p1) {    return A2($Signal.message,address,KeyPress(_p1));})
+              ,A2(onEnter,address,Submit)
+              ,inputStyle]),
+      _U.list([]));
    });
+   var view = F2(function (address,model) {    return A2($Html.div,_U.list([containerStyle]),_U.list([header,A2(nameInput,address,model),star(model)]));});
    var NoOp = {ctor: "NoOp"};
    var Model = F2(function (a,b) {    return {input: a,stars: b};});
    var update = F2(function (action,model) {
-      var _p2 = A2($Debug.log,"action",action);
+      var _p2 = action;
       switch (_p2.ctor)
       {case "KeyPress": return {ctor: "_Tuple2",_0: _U.update(model,{input: _p2._0}),_1: $Effects.none};
          case "Submit": return {ctor: "_Tuple2",_0: model,_1: submitEffects(model.input)};
@@ -11085,6 +11086,9 @@ Elm.Github.make = function (_elm) {
                                ,h1Style: h1Style
                                ,starsStyle: starsStyle
                                ,inputStyle: inputStyle
+                               ,star: star
+                               ,header: header
+                               ,nameInput: nameInput
                                ,view: view
                                ,init: init
                                ,app: app
