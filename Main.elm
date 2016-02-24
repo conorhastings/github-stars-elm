@@ -16,7 +16,7 @@ type Action =
   NoOp |
   KeyPress String  |
   Submit |
-  OnSubmit (Result Http.Error Int)
+  OnSubmit (Result Http.Error (List Stargazers))
 
 update : Action -> Model -> (Model, Effects.Effects Action)
 update action model = 
@@ -26,30 +26,34 @@ update action model =
     Submit -> 
       (model, submitEffects model.input)
     OnSubmit result ->
-      (Model model.input (Result.withDefault model.stars result), Effects.none)
+      (Model model.input (Result.map totalStars result|> Result.toMaybe |> Maybe.withDefault 0), Effects.none)
     _ -> 
       (model, Effects.none)
+
+type alias Stargazers =
+  { stargazers_count: Int }
 
 httpString : String -> String
 httpString user = 
   "https://api.github.com/users/" ++ user ++ "/repos"
 
-httpTask : String -> Task.Task Http.Error (List Int)
+httpTask : String -> Task.Task Http.Error (List Stargazers)
 httpTask user =
   Http.get decodeResult (httpString user)
 
-decodeResult : Json.Decoder (List Int)
+decodeResult : Json.Decoder (List Stargazers)
 decodeResult =
-  let result =
-        Json.object1 (\stars -> stars)
-          ("stargazers_count" := Json.int)
-  in
-    "" := Json.list result
+  Json.list <| 
+    Json.object1 Stargazers
+      ("stargazers_count" := Json.int)
+
+totalStars : (List Stargazers) -> Int
+totalStars list = 
+  List.sum (List.map .stargazers_count list)
 
 submitEffects : String -> Effects.Effects Action
 submitEffects user = 
   (httpTask user)
-  |> Task.map List.sum
   |> Task.toResult
   |> Task.map OnSubmit
   |> Effects.task
