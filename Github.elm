@@ -105,6 +105,10 @@ inputStyle =
   , ("fontWeight", "300")
   ]
 
+star : Model -> Html.Html
+star model =
+  if model.stars > 0 then div [starsStyle] [text (toString model.stars)] else text ""
+
 view : Signal.Address Action -> Model -> Html
 view address model =
   div [containerStyle] [
@@ -118,8 +122,7 @@ view address model =
       , inputStyle
       ]
       []
-    ,
-    div [starsStyle] [text (toString model.stars)]
+    , star model
   ]
 
 init : (Model, Effects Action)
