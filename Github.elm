@@ -20,13 +20,13 @@ type Action =
 
 update : Action -> Model -> (Model, Effects.Effects Action)
 update action model = 
-  case Debug.log "action" action of 
+  case action of 
     KeyPress value -> 
       ({model | input = value}, Effects.none)
     Submit -> 
       (model, submitEffects model.input)
     OnSubmit result ->
-      (Model model.input (Result.map totalStars result|> Result.toMaybe |> Maybe.withDefault 0), Effects.none)
+      (Model model.input (Result.map totalStars result |> Result.toMaybe |> Maybe.withDefault 0), Effects.none)
     _ -> 
       (model, Effects.none)
 
