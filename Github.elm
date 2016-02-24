@@ -105,24 +105,33 @@ inputStyle =
   , ("fontWeight", "300")
   ]
 
-star : Model -> Html.Html
+star : Model -> Html
 star model =
   if model.stars > 0 then div [starsStyle] [text (toString model.stars)] else text ""
+
+header : Html.Html
+header = 
+  h1 [h1Style] [text "enter your github username and press enter"]
+
+nameInput : Signal.Address Action -> Model -> Html.Html
+nameInput address model =
+  input 
+    [ placeholder "conorhastings"
+    , value model.input
+    , on "input" targetValue (Signal.message address << KeyPress)
+    , onEnter address Submit
+    , inputStyle
+    ]
+    []
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   div [containerStyle] [
-    h1 [h1Style] [text "enter your github username and press enter"]
-    ,
-    input 
-      [ placeholder "conorhastings"
-      , value model.input
-      , on "input" targetValue (Signal.message address << KeyPress)
-      , onEnter address Submit
-      , inputStyle
-      ]
-      []
-    , star model
+    header
+    , 
+    nameInput address model
+    , 
+    star model
   ]
 
 init : (Model, Effects Action)
