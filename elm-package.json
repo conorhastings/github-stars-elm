@@ -1,6 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "github stars for user",
+    "repository": "https://github.com/conorhastings/github-stars-elm.git",
     "license": "MIT",
     "source-directories": [
         "."

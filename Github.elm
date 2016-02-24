@@ -1,4 +1,4 @@
-module Main (..) where
+module Github (..) where
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
@@ -35,7 +35,7 @@ type alias Stargazers =
 
 httpString : String -> String
 httpString user = 
-  "https://api.github.com/users/" ++ user ++ "/repos"
+  "https://api.github.com/users/" ++ user ++ "/repos?per_page=100"
 
 httpTask : String -> Task.Task Http.Error (List Stargazers)
 httpTask user =
@@ -69,18 +69,57 @@ is13 : Int -> Result String ()
 is13 key =
   if key == 13 then Ok () else Err "incorrect keyCode"
 
+containerStyle: Html.Attribute
+containerStyle =
+  style
+  [ ("display", "flex")
+  , ("alignItems", "center")
+  , ("justifyContent", "center")
+  , ("textAlign", "center")
+  , ("fontFamily", "'Helvetica Neue', Helvetica, Arial, sans-serif")
+  , ("flexDirection", "column")
+  ]
+
+h1Style : Html.Attribute
+h1Style = 
+  style
+  [ ("fontSize", "56px") 
+  , ("color", "#343434")
+  ]
+
+starsStyle : Html.Attribute
+starsStyle =
+  style
+  [ ("fontSize", "56px")
+  , ("fontWeight", "600")
+  , ("color", "#343434")
+  ]
+
+inputStyle: Html.Attribute
+inputStyle = 
+  style
+  [ ("width", "40vw")
+  , ("height", "15vh")
+  , ("fontSize", "4vw")
+  , ("textAlign", "center")
+  , ("fontWeight", "300")
+  ]
+
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div [] [
+  div [containerStyle] [
+    h1 [h1Style] [text "enter your github username and press enter"]
+    ,
     input 
       [ placeholder "conorhastings"
       , value model.input
       , on "input" targetValue (Signal.message address << KeyPress)
       , onEnter address Submit
+      , inputStyle
       ]
       []
     ,
-    div [] [text (toString model.stars)]
+    div [starsStyle] [text (toString model.stars)]
   ]
 
 init : (Model, Effects Action)
@@ -99,6 +138,9 @@ app =
 main : Signal.Signal Html.Html
 main = 
   app.html
+
+port title : String
+port title = "Get your total github stars"
 
 port fetch : Signal (Task.Task Never ())
 port fetch =
